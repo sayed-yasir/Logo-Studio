@@ -1,0 +1,28 @@
+/* SEO / indexable content only. Uses the existing design tokens from style.css. */
+.seo-page{max-width:760px}
+.seo-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 22px;font-size:.82rem;color:var(--muted)}
+.seo-crumbs a:hover{color:var(--text)}
+.seo-actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 0}
+.seo-sec{margin-top:40px}
+.seo-sec h2{font-size:1.2rem;font-weight:500;letter-spacing:-.01em;margin:0 0 12px}
+.seo-sec p,.seo-sec li{max-width:68ch;line-height:1.75;color:var(--muted)}
+.seo-sec p{margin:0 0 1em}
+.seo-sec ul{margin:0;padding-left:1.2em}
+.seo-sec li{margin:0 0 .5em}
+.seo-sec p a{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+ul.seo-links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px 24px}
+ul.seo-links li{margin:0}
+ul.seo-links a{display:block;padding:7px 0;color:var(--muted);transition:color .3s}
+ul.seo-links a:hover{color:var(--text)}
+.seo-intro{margin-top:clamp(56px,9vw,104px);padding-top:clamp(32px,5vw,56px);border-top:1px solid var(--line)}
+.seo-intro[hidden]{display:none}
+.seo-intro-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:36px 64px}
+@media(min-width:900px){.seo-intro-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.seo-intro section+section{margin-top:28px}
+.seo-intro h2{font-size:1.1rem;font-weight:500;margin:0 0 10px}
+.seo-intro p,.seo-intro li{max-width:60ch;color:var(--muted);font-size:.92rem;line-height:1.7}
+.seo-intro p{margin:0 0 .8em}
+.seo-intro ul{margin:0;padding-left:1.2em}
+.seo-intro ul.seo-links{padding:0;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.seo-intro ul.seo-links a{font-size:.88rem}
+@media(max-width:719px){.seo-actions .btn{width:100%}}

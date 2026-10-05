@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sayed-yasir.github.io/Logo-Studio/sitemap.xml
