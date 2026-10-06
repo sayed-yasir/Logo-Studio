@@ -1,0 +1,103 @@
+{
+  "images": [
+    {
+      "category": "wordmark",
+      "image": "samples/images/WORDMARK-0001.webp",
+      "file": "images/WORDMARK-0001.webp",
+      "title": "Velora — Modern Wordmark",
+      "alt": "AI-generated wordmark logo concept for Velora",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "WORDMARK-0001",
+      "promptId": "WORDMARK-0001"
+    },
+    {
+      "category": "wordmark",
+      "image": "samples/images/WORDMARK-0013.webp",
+      "file": "images/WORDMARK-0013.webp",
+      "title": "Everleaf — Elegant Wordmark",
+      "alt": "AI-generated wordmark logo concept for Everleaf",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "WORDMARK-0013",
+      "promptId": "WORDMARK-0013"
+    },
+    {
+      "category": "wordmark",
+      "image": "samples/images/WORDMARK-0027.webp",
+      "file": "images/WORDMARK-0027.webp",
+      "title": "Nexora — Futuristic Wordmark",
+      "alt": "AI-generated wordmark logo concept for Nexora",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "WORDMARK-0027",
+      "promptId": "WORDMARK-0027"
+    },
+    {
+      "category": "monogram",
+      "image": "samples/images/MONOGRAM-0101.webp",
+      "file": "images/MONOGRAM-0101.webp",
+      "title": "RK Studio — Geometric Monogram",
+      "alt": "AI-generated monogram logo concept for RK Studio",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "MONOGRAM-0101",
+      "promptId": "MONOGRAM-0101"
+    },
+    {
+      "category": "monogram",
+      "image": "samples/images/MONOGRAM-0118.webp",
+      "file": "images/MONOGRAM-0118.webp",
+      "title": "Avenir — Fluid Monogram",
+      "alt": "AI-generated monogram logo concept for Avenir",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "MONOGRAM-0118",
+      "promptId": "MONOGRAM-0118"
+    },
+    {
+      "category": "monogram",
+      "image": "samples/images/MONOGRAM-0136.webp",
+      "file": "images/MONOGRAM-0136.webp",
+      "title": "Sadra — Luxury Monogram",
+      "alt": "AI-generated monogram logo concept for Sadra",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "MONOGRAM-0136",
+      "promptId": "MONOGRAM-0136"
+    },
+    {
+      "category": "minimal",
+      "image": "samples/images/MINIMAL-0042.webp",
+      "file": "images/MINIMAL-0042.webp",
+      "title": "Summit — Minimal Mountain Mark",
+      "alt": "AI-generated minimal logo concept for Summit",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "MINIMAL-0042",
+      "promptId": "MINIMAL-0042"
+    },
+    {
+      "category": "minimal",
+      "image": "samples/images/MINIMAL-0057.webp",
+      "file": "images/MINIMAL-0057.webp",
+      "title": "PureLife — Minimal Leaf Mark",
+      "alt": "AI-generated minimal logo concept for PureLife",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "MINIMAL-0057",
+      "promptId": "MINIMAL-0057"
+    },
+    {
+      "category": "minimal",
+      "image": "samples/images/MINIMAL-0079.webp",
+      "file": "images/MINIMAL-0079.webp",
+      "title": "Althea — Minimal Abstract Mark",
+      "alt": "AI-generated minimal logo concept for Althea",
+      "tool": "OpenAI image generation",
+      "aiGenerated": true,
+      "prompt": "MINIMAL-0079",
+      "promptId": "MINIMAL-0079"
+    }
+  ]
+}

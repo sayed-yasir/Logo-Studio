@@ -26,3 +26,19 @@ ul.seo-links a:hover{color:var(--text)}
 .seo-intro ul.seo-links{padding:0;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
 .seo-intro ul.seo-links a{font-size:.88rem}
 @media(max-width:719px){.seo-actions .btn{width:100%}}
+/* Real prompt excerpt */
+.seo-sample{margin:18px 0 0;padding:20px 22px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+.seo-sample-id{margin:0 0 14px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seo-sample-id code{font-family:var(--f);letter-spacing:.04em;color:var(--text);text-transform:none;font-size:.9rem}
+.seo-sample dl{display:block;margin:0}
+.seo-sample dt{display:block;grid-column:auto;margin:16px 0 4px;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.seo-sample dt:first-child{margin-top:0}
+.seo-sample dd{display:block;grid-column:auto;width:auto;margin:0;max-width:68ch;line-height:1.7;color:var(--muted)}
+/* Gallery of AI-generated examples (only rendered when real images are listed in samples/samples.json) */
+.seo-gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:14px}
+.seo-gallery figure{margin:0}
+.seo-gallery img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:var(--r);background:#fff}
+.seo-gallery figcaption{margin-top:8px;font-size:.8rem;line-height:1.5;color:var(--muted)}
+.seo-gallery figcaption a{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+.ai-badge{display:inline-block;margin-right:6px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+

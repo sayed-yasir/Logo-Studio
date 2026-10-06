@@ -22,7 +22,7 @@ export const CATEGORIES = [
   },
   {
     id: "abstract-symbol", slug: "abstract-symbol", name: "Abstract Symbol", h1: "Abstract Symbol Logo Prompts",
-    title: "Abstract Symbol Logo Prompts for Non-Literal Marks | Logo Studio",
+    title: "Abstract Symbol Logo Prompts | Logo Studio",
     description: "Browse abstract symbol logo prompts that develop invented shapes with their own internal logic, and customize them with your brand name.",
     intro: "An abstract symbol does not depict an object. It uses shape, proportion and rhythm to stand for a feeling or an idea the brand wants to carry.",
     style: [
@@ -58,7 +58,7 @@ export const CATEGORIES = [
   },
   {
     id: "lettermark", slug: "lettermark", name: "Lettermark", h1: "Lettermark Logo Prompts",
-    title: "Lettermark Logo Prompts for Acronym and Initial Marks | Logo Studio",
+    title: "Lettermark Logo Prompts for Initial Marks | Logo Studio",
     description: "Lettermark logo prompts for compact initial-based marks where letters stay readable but are tuned as one designed form. Try them with your brand name.",
     intro: "A lettermark uses a brand's initials as its logo. Unlike a monogram built on fusion, the letters usually stay separate and recognizable.",
     style: [
@@ -76,7 +76,7 @@ export const CATEGORIES = [
   },
   {
     id: "negative-space", slug: "negative-space", name: "Negative Space", h1: "Negative Space Logo Prompts",
-    title: "Negative Space Logo Prompts for Dual-Meaning Marks | Logo Studio",
+    title: "Negative Space Logo Prompts for Hidden Forms | Logo Studio",
     description: "Negative space logo prompts for hidden secondary forms, voids and silhouettes that reward a second look. Customize one with your brand name.",
     intro: "Negative space logos use the empty area around and inside shapes to reveal a second image or letter.",
     style: [
@@ -130,7 +130,7 @@ export const CATEGORIES = [
   },
   {
     id: "futuristic", slug: "futuristic", name: "Futuristic", h1: "Futuristic Logo Prompts",
-    title: "Futuristic Logo Prompts for Forward-Looking Brands | Logo Studio",
+    title: "Futuristic Logo Prompts for Modern Brands | Logo Studio",
     description: "Futuristic logo prompts with precise angles, segmented forms and engineered clarity. Develop a forward-looking direction with your brand name.",
     intro: "Futuristic logos suggest what comes next through precision, using sharp angles, segmented shapes and clean cuts.",
     style: [
@@ -148,7 +148,7 @@ export const CATEGORIES = [
   },
   {
     id: "luxury-premium", slug: "luxury-premium", name: "Luxury Premium", h1: "Luxury Premium Logo Prompts",
-    title: "Luxury Premium Logo Prompts for Refined Identities | Logo Studio",
+    title: "Luxury Premium Logo Prompts for Refined Brands | Logo Studio",
     description: "Luxury premium logo prompts focused on restraint, fine line work and sophisticated typography. Customize a refined direction with your brand name.",
     intro: "A premium identity usually communicates through restraint. Proportion, spacing and craft carry the impression, not decoration.",
     style: [
@@ -166,7 +166,7 @@ export const CATEGORIES = [
   },
   {
     id: "tech-ai", slug: "tech-ai", name: "Tech / AI", h1: "Tech / AI Logo Prompts",
-    title: "Tech / AI Logo Prompts for Software and AI Brands | Logo Studio",
+    title: "Tech / AI Logo Prompts for Software Brands | Logo Studio",
     description: "Tech and AI logo prompts exploring networks, computational structures and neural-inspired geometry. Customize them with your brand name.",
     intro: "Marks for software and intelligent systems often draw on networks, nodes, grids and layered structures.",
     style: [
@@ -184,7 +184,7 @@ export const CATEGORIES = [
   },
   {
     id: "emblem", slug: "emblem", name: "Emblem", h1: "Emblem Logo Prompts",
-    title: "Emblem Logo Prompts for Badge, Seal and Crest Marks | Logo Studio",
+    title: "Emblem Logo Prompts for Badge and Crest Marks | Logo Studio",
     description: "Emblem logo prompts for badges, seals and crests where symbol and name sit in one contained shape. Customize them with your brand name.",
     intro: "An emblem places the symbol and the name inside one contained shape, such as a badge, seal, shield or crest.",
     style: [
@@ -202,7 +202,7 @@ export const CATEGORIES = [
   },
   {
     id: "symbolic", slug: "symbolic", name: "Symbolic", h1: "Symbolic Logo Prompts",
-    title: "Symbolic Logo Prompts for Metaphor-Driven Marks | Logo Studio",
+    title: "Symbolic Logo Prompts for Metaphor Marks | Logo Studio",
     description: "Symbolic logo prompts that use a clear metaphor chosen for the brand name's meaning. Explore the direction and customize it with your brand name.",
     intro: "A symbolic logo uses a recognizable image as a metaphor, such as a path, a seed or a doorway, chosen for its link to the brand's meaning.",
     style: [
@@ -256,7 +256,7 @@ export const CATEGORIES = [
   },
   {
     id: "elegant", slug: "elegant", name: "Elegant", h1: "Elegant Logo Prompts",
-    title: "Elegant Logo Prompts for Graceful, Refined Marks | Logo Studio",
+    title: "Elegant Logo Prompts for Refined Marks | Logo Studio",
     description: "Elegant logo prompts with graceful curves, calligraphic influence and delicate contrast. Customize a refined direction with your brand name.",
     intro: "Elegant logos favor graceful curves, calligraphic influence and delicate contrast between thick and thin strokes.",
     style: [
@@ -274,7 +274,7 @@ export const CATEGORIES = [
   },
   {
     id: "timeless", slug: "timeless", name: "Timeless", h1: "Timeless Logo Prompts",
-    title: "Timeless Logo Prompts for Durable, Classic Marks | Logo Studio",
+    title: "Timeless Logo Prompts for Classic Marks | Logo Studio",
     description: "Timeless logo prompts that use fundamental shapes, classical proportions and durable construction. Customize them with your brand name.",
     intro: "A timeless logo tries to avoid dating itself. It relies on fundamental shapes, classical proportions and sound construction.",
     style: [
@@ -292,7 +292,7 @@ export const CATEGORIES = [
   },
   {
     id: "abstract-letterform", slug: "abstract-letterform", name: "Abstract Letterform", h1: "Abstract Letterform Logo Prompts",
-    title: "Abstract Letterform Logo Prompts for Letter Symbols | Logo Studio",
+    title: "Abstract Letterform Logo Prompts | Logo Studio",
     description: "Abstract letterform logo prompts where a letter is stretched, cut or rotated into a symbol. Customize one with your brand name in Logo Studio.",
     intro: "An abstract letterform takes a single letter and transforms it into a symbol, while keeping enough of the original shape to be recognized.",
     style: [
@@ -310,7 +310,7 @@ export const CATEGORIES = [
   },
   {
     id: "organic-geometric", slug: "organic-geometric", name: "Organic Geometric", h1: "Organic Geometric Logo Prompts",
-    title: "Organic Geometric Logo Prompts: Nature Meets Structure | Logo Studio",
+    title: "Organic Geometric Logo Prompts | Logo Studio",
     description: "Organic geometric logo prompts that fuse controlled geometry with natural curves and growth forms. Customize them with your brand name.",
     intro: "Organic geometric logos combine controlled geometry with natural curves, growth patterns and biological structures.",
     style: [
@@ -328,7 +328,7 @@ export const CATEGORIES = [
   },
   {
     id: "modern-classic", slug: "modern-classic", name: "Modern Classic", h1: "Modern Classic Logo Prompts",
-    title: "Modern Classic Logo Prompts for Heritage with Restraint | Logo Studio",
+    title: "Modern Classic Logo Prompts | Logo Studio",
     description: "Modern classic logo prompts that simplify classical structure and proportion with modern restraint. Customize them with your brand name.",
     intro: "Modern classic logos keep the structure and proportion of traditional design but strip it back with modern restraint.",
     style: [
@@ -346,7 +346,7 @@ export const CATEGORIES = [
   },
   {
     id: "experimental-mark", slug: "experimental-mark", name: "Experimental Mark", h1: "Experimental Mark Logo Prompts",
-    title: "Experimental Mark Logo Prompts for Unconventional Logos | Logo Studio",
+    title: "Experimental Mark Logo Prompts | Logo Studio",
     description: "Experimental mark logo prompts with unconventional construction, unusual symbol logic and optical experiments. Customize them with your brand name.",
     intro: "Experimental marks break from convention through unusual construction, unexpected symbol logic or optical effects.",
     style: [

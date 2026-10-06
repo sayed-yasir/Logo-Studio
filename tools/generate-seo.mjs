@@ -2,12 +2,14 @@
 //   node tools/generate-seo.mjs
 // Regenerates: 20 category pages, sitemap.xml, robots.txt, and the marked SEO
 // blocks inside index.html. Every absolute URL is derived from SITE_URL.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
+import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   SITE_URL, SITE_NAME, HOME_TITLE, HOME_DESCRIPTION,
-  OG_IMAGE_PATH, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT, OG_IMAGE_ALT
+  OG_IMAGE_PATH, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT, OG_IMAGE_ALT, GOOGLE_SITE_VERIFICATION
 } from "./seo-config.mjs";
 import { CATEGORIES } from "./seo-categories.mjs";
 
@@ -22,6 +24,128 @@ const catPath = c => `${c.slug}-logo-prompts/`;
 const catUrl = c => url(catPath(c));
 const byId = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 const IMG = url(OG_IMAGE_PATH);
+
+/* ---------- Google Search Console verification (home page only; nothing is written when the value is empty) ---------- */
+const VERIFY = String(GOOGLE_SITE_VERIFICATION ?? "").trim();
+if (VERIFY && !/^[A-Za-z0-9_-]{20,120}$/.test(VERIFY)) {
+  throw new Error("GOOGLE_SITE_VERIFICATION in seo-config.mjs looks invalid. Paste only the content=\"...\" value (letters, digits, - and _).");
+}
+const verifyTag = VERIFY ? `<meta name="google-site-verification" content="${esc(VERIFY)}">\n` : "";
+
+/* ---------- real data from the prompt library (js/library-data.js) ---------- */
+function loadLibrary() {
+  const src = readFileSync(join(ROOT, "js/library-data.js"), "utf8");
+  const b64 = /LIB_B64="([^"]+)"/.exec(src)?.[1];
+  if (!b64) throw new Error("Could not find LIB_B64 in js/library-data.js");
+  const buf = gunzipSync(Buffer.from(b64, "base64"));
+  const len = buf.readUInt32BE(0);
+  return { M: JSON.parse(buf.subarray(4, 4 + len).toString("utf8")), BIN: buf.subarray(4 + len) };
+}
+const LIB = loadLibrary();
+const LIBCAT = Object.fromEntries(LIB.M.c.map(c => [c.id, c]));
+const pad4 = n => String(n).padStart(4, "0");
+// Same row decoding as js/library.js: one option per field, picked by the byte stored for that prompt.
+function promptParts(lc, n) {
+  const w = lc.v.length, row = lc.o + (n - 1) * w;
+  return lc.f.map((opts, k) => { const v = lc.v.indexOf(k); return opts[v < 0 ? 0 : LIB.BIN[row + v]]; });
+}
+const section = (parts, name) => parts[LIB.M.h.indexOf(name) + 1];
+
+/* Six real "design idea" options + one real prompt excerpt per category. Deterministic: same library -> same page. */
+function sampleFor(c) {
+  const lc = LIBCAT[c.id];
+  if (!lc) throw new Error(`Category "${c.id}" does not exist in the prompt library`);
+  const n = 101 + CATEGORIES.indexOf(c) * 137;
+  const parts = promptParts(lc, n);
+  const idea = section(parts, "DESIGN IDEA");
+  const ideas = lc.f[1], picks = [];
+  for (let i = 0; i < ideas.length && picks.length < 6; i += 3) picks.push(ideas[ideas[i] === idea ? i + 1 : i]);
+  return {
+    id: `${lc.p}-${pad4(n)}`,
+    directions: picks,
+    excerpt: [["Design idea", idea], ["Brand personality", section(parts, "BRAND PERSONALITY")], ["Geometry", section(parts, "GEOMETRY").split(" Stroke and corner treatment: ")[0]]]
+  };
+}
+function sampleHtml(c) {
+  const s = sampleFor(c);
+  return `<section class="seo-sec" aria-labelledby="a-dir"><h2 id="a-dir">Design directions in the ${esc(c.name)} library</h2>
+<p>Six of the design ideas that ${esc(c.name)} prompts can start from. Each ${esc(c.name)} prompt in the library pairs one idea like these with its own composition, typography and color logic.</p>
+<ul>
+${s.directions.map(d => `<li>${esc(d)}</li>`).join("\n")}
+</ul>
+</section>
+<section class="seo-sec" aria-labelledby="a-ex"><h2 id="a-ex">Example ${esc(c.name)} prompt</h2>
+<p>An excerpt of a real prompt from the library. <a href="../#/prompt/${encodeURIComponent(s.id)}">Open the full ${esc(c.name)} prompt</a> to read every section and customize it with your brand name.</p>
+<aside class="seo-sample" aria-label="Example prompt excerpt"><p class="seo-sample-id">Prompt ID <code>${esc(s.id)}</code></p>
+<dl>
+${s.excerpt.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("\n")}
+</dl></aside>
+</section>`;
+}
+
+/* ---------- gallery of AI-generated examples (samples/samples.json) ---------- */
+// Nothing is rendered for a category until real images are listed for it. Entries are validated strictly,
+// so a typo, a missing file or an unlabelled image stops the build instead of publishing something wrong.
+function webpSize(b) {
+  if (b.length < 30 || b.toString("ascii", 0, 4) !== "RIFF" || b.toString("ascii", 8, 12) !== "WEBP") return null;
+  const t = b.toString("ascii", 12, 16);
+  if (t === "VP8 ") return { w: b.readUInt16LE(26) & 0x3fff, h: b.readUInt16LE(28) & 0x3fff };
+  if (t === "VP8L") { const x = b.readUInt32LE(21); return { w: (x & 0x3fff) + 1, h: ((x >> 14) & 0x3fff) + 1 }; }
+  if (t === "VP8X") return { w: 1 + (b[24] | b[25] << 8 | b[26] << 16), h: 1 + (b[27] | b[28] << 8 | b[29] << 16) };
+  return null;
+}
+const sha = s => createHash("sha256").update(s).digest("hex").slice(0, 16);
+const GALLERY = {};
+function loadGallery() {
+  const file = join(ROOT, "samples/samples.json");
+  if (!existsSync(file)) return;
+  const data = JSON.parse(readFileSync(file, "utf8"));
+  const list = Array.isArray(data) ? data : data.images;
+  if (!Array.isArray(list)) throw new Error('samples/samples.json must contain an "images" array');
+  list.forEach((e, i) => {
+    const where = `samples/samples.json, image #${i + 1}`;
+    const c = byId[e.category];
+    if (!c) throw new Error(`${where}: unknown category "${e.category}"`);
+    const lc = LIBCAT[c.id];
+    const m = /^([A-Z][A-Z-]*)-(\d{4})$/.exec(String(e.prompt || ""));
+    if (!m || m[1] !== lc.p || +m[2] < 1 || +m[2] > 5000) throw new Error(`${where}: "prompt" must be a real ID of this category, from ${lc.p}-0001 to ${lc.p}-5000`);
+    if (e.aiGenerated !== true) throw new Error(`${where}: "aiGenerated" must be true for gallery samples.`);
+    if (typeof e.file !== "string" || e.file.includes("..") || !/^[a-z0-9][a-z0-9._/-]*\.webp$/i.test(e.file)) throw new Error(`${where}: "file" must be a .webp path relative to the samples folder`);
+    const path = join(ROOT, "samples", e.file);
+    if (!existsSync(path)) throw new Error(`${where}: samples/${e.file} does not exist`);
+    const alt = String(e.alt || "").trim();
+    if (alt.length < 10 || alt.length > 200) throw new Error(`${where}: "alt" must describe the image in 10-200 characters`);
+    const bytes = readFileSync(path), dim = webpSize(bytes);
+    if (!dim) throw new Error(`${where}: samples/${e.file} is not a valid WebP image`);
+    if (statSync(path).size > 300000) console.warn(`Warning: samples/${e.file} is larger than 300 KB; compress it for faster pages.`);
+    const tool = String(e.tool || "").trim().slice(0, 60);
+    (GALLERY[c.id] ||= []).push({ file: e.file, prompt: e.prompt, alt, tool, aiGenerated: e.aiGenerated === true, w: dim.w, h: dim.h, hash: sha(bytes) });
+  });
+}
+function galleryHtml(c) {
+  const items = GALLERY[c.id];
+  if (!items || !items.length) return "";
+  const figs = items.map(g => `<figure>
+<img src="../samples/${esc(g.file)}" width="${g.w}" height="${g.h}" alt="${esc(g.alt)}" loading="lazy" decoding="async">
+<figcaption><span class="ai-badge">AI-generated</span>Prompt <a href="../#/prompt/${encodeURIComponent(g.prompt)}">${esc(g.prompt)}</a>${g.tool ? ` · ${esc(g.tool)}` : ""}</figcaption>
+</figure>`).join("\n");
+  return `<section class="seo-sec seo-gallery" aria-labelledby="a-gal"><h2 id="a-gal">AI-generated ${esc(c.name)} examples</h2>
+<p>These are AI-generated visual demonstrations connected to real prompts in the ${esc(c.name)} library. They are concept examples, not client work or finished brand identities.</p>
+<div class="seo-gal-grid">
+${figs}
+</div>
+</section>`;
+}
+
+/* ---------- lastmod: a page only gets a new date when its content really changed (tools/lastmod.json) ---------- */
+const LM_FILE = join(ROOT, "tools/lastmod.json");
+const lmPrev = existsSync(LM_FILE) ? JSON.parse(readFileSync(LM_FILE, "utf8")) : {};
+const lmNext = {};
+function stamp(key, content) {
+  const hash = sha(content), prev = lmPrev[key];
+  lmNext[key] = prev && prev.hash === hash ? prev : { hash, lastmod: LASTMOD };
+  return lmNext[key].lastmod;
+}
 
 /* ---------- shared head pieces ---------- */
 function social({ title, description, pageUrl }) {
@@ -63,7 +187,7 @@ function homeHead() {
 <title>${esc(HOME_TITLE)}</title>
 <meta name="description" content="${esc(HOME_DESCRIPTION)}">
 <link rel="canonical" href="${esc(SITE_URL)}">
-${social({ title: HOME_TITLE, description: HOME_DESCRIPTION, pageUrl: SITE_URL })}
+${verifyTag}${social({ title: HOME_TITLE, description: HOME_DESCRIPTION, pageUrl: SITE_URL })}
 ${ld(graph)}
 <!--SEO:END-->`;
 }
@@ -186,6 +310,8 @@ ${style}
 <section class="seo-sec" aria-labelledby="a2"><h2 id="a2">Brands it can suit</h2>
 <p>${esc(c.suits)}</p>
 </section>
+${sampleHtml(c)}
+${galleryHtml(c)}
 <section class="seo-sec" aria-labelledby="a3"><h2 id="a3">Practical design considerations</h2>
 <ul>
 ${cons}
@@ -215,27 +341,47 @@ ${related}
 }
 
 function writeCategoryPages() {
-  for (const c of CATEGORIES) {
+  return CATEGORIES.map(c => {
     const dir = join(ROOT, catPath(c));
+    const html = categoryPage(c);
     mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "index.html"), categoryPage(c));
-  }
+    writeFileSync(join(dir, "index.html"), html);
+    return { c, html };
+  });
 }
 
 /* ---------- sitemap + robots ---------- */
-function writeSitemapAndRobots() {
-  const entries = [{ loc: SITE_URL }, ...CATEGORIES.map(c => ({ loc: catUrl(c) }))];
+function writeSitemapAndRobots(pages) {
+  const home = readFileSync(join(ROOT, "index.html"), "utf8");
+  const entries = [
+    { loc: SITE_URL, lastmod: stamp(SITE_URL, home), images: [] },
+    ...pages.map(({ c, html }) => {
+      const imgs = GALLERY[c.id] || [];
+      return { loc: catUrl(c), lastmod: stamp(catUrl(c), html + imgs.map(g => g.hash).join()), images: imgs.map(g => url("samples/" + g.file)) };
+    })
+  ];
+  const withImages = entries.some(e => e.images.length);
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${entries.map(e => `  <url>\n    <loc>${esc(e.loc)}</loc>\n    <lastmod>${LASTMOD}</lastmod>\n  </url>`).join("\n")}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${withImages ? ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' : ""}>
+${entries.map(e => `  <url>\n    <loc>${esc(e.loc)}</loc>\n    <lastmod>${e.lastmod}</lastmod>${e.images.map(i => `\n    <image:image><image:loc>${esc(i)}</image:loc></image:image>`).join("")}\n  </url>`).join("\n")}
 </urlset>
 `;
   writeFileSync(join(ROOT, "sitemap.xml"), xml);
   writeFileSync(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${url("sitemap.xml")}\n`);
+  const sorted = Object.fromEntries(Object.keys(lmNext).sort().map(k => [k, lmNext[k]]));
+  writeFileSync(LM_FILE, JSON.stringify(sorted, null, 2) + "\n");
 }
 
 if (new Set(CATEGORIES.map(c => c.slug)).size !== CATEGORIES.length) throw new Error("duplicate slug");
-writeCategoryPages();
-writeSitemapAndRobots();
+if (HOME_TITLE.length > 60) console.warn(`Warning: home title is ${HOME_TITLE.length} characters (search results usually cut after ~60).`);
+if (HOME_DESCRIPTION.length > 160) console.warn(`Warning: home description is ${HOME_DESCRIPTION.length} characters (search results usually cut after ~160).`);
+for (const c of CATEGORIES) {
+  if (c.title.length > 60) console.warn(`Warning: title of ${c.id} is ${c.title.length} characters.`);
+  if (c.description.length > 160) console.warn(`Warning: description of ${c.id} is ${c.description.length} characters.`);
+}
+loadGallery();
+const pages = writeCategoryPages();
 patchIndex();
-console.log(`Generated ${CATEGORIES.length} category pages, sitemap.xml, robots.txt and index.html SEO blocks for ${SITE_URL}`);
+writeSitemapAndRobots(pages);
+const nImg = Object.values(GALLERY).reduce((n, l) => n + l.length, 0);
+console.log(`Generated ${CATEGORIES.length} category pages (${nImg} gallery image${nImg === 1 ? "" : "s"}), sitemap.xml, robots.txt and index.html SEO blocks for ${SITE_URL}${VERIFY ? " (with Google verification tag)" : " (no verification tag)"}`);

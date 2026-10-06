@@ -32,7 +32,19 @@ const DEFAULT_CATS=[
 {id:'modern-classic',name:'Modern Classic',desc:'Classical structure and proportion, simplified with modern restraint. Heritage cues are used as geometry and never as ornament.'},
 {id:'experimental-mark',name:'Experimental Mark',desc:'Unconventional construction, unusual symbol logic and optical experiments that remain usable as a real logo.'}];
 let adapter=null,CATLIST=DEFAULT_CATS,ncSeen=false;
-const lib=(m,...a)=>adapter&&typeof adapter[m]==='function'?Promise.resolve().then(()=>adapter[m](...a)):Promise.reject({code:'NOT_CONNECTED'});
+/* The prompt library (~900 KB) is fetched after the first paint (see the end of this file) or at once if an action needs it.
+   Every call made before it is ready simply waits for it, so a click on Generate on a slow connection is held and then runs by itself. */
+let libP=null,readyRes;const ready=new Promise(r=>{readyRes=r});
+const addScript=src=>new Promise((ok,bad)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>bad(new Error('Could not load '+src));document.head.appendChild(s)});
+function ensureLib(){
+ if(adapter)return Promise.resolve();
+ if(!libP)libP=addScript(APP_BASE+'js/library-data.js').then(()=>addScript(APP_BASE+'js/library.js'))
+  .then(()=>Promise.race([ready,new Promise((_,no)=>setTimeout(()=>no(new Error('The prompt library took too long to load.')),45000))]))
+  .catch(e=>{libP=null;throw e});
+ return libP;
+}
+const NOTCONN=()=>Promise.reject({code:'NOT_CONNECTED'});
+const lib=(m,...a)=>ensureLib().then(()=>adapter&&typeof adapter[m]==='function'?adapter[m](...a):NOTCONN(),NOTCONN);
 const nc=p=>p.catch(e=>{if(e&&e.code==='NOT_CONNECTED')ncSeen=true;throw e});
 const API={
  categories:()=>lib('categories').catch(e=>{if(e&&e.code==='NOT_CONNECTED')return DEFAULT_CATS;console.error('[Logo Studio] Could not load categories from the prompt library.',e);throw e}),
@@ -40,7 +52,7 @@ const API={
  search:q=>nc(lib('search',q)),
  get:id=>nc(lib('get',id))
 };
-window.LogoStudio={connect(a){adapter=a;API.categories().then(c=>{if(Array.isArray(c)&&c.length)CATLIST=c},()=>{/* already logged by API.categories; the built-in category list stays in use */}).then(()=>{
+window.LogoStudio={connect(a){adapter=a;readyRes();API.categories().then(c=>{if(Array.isArray(c)&&c.length)CATLIST=c},()=>{/* already logged by API.categories; the built-in category list stays in use */}).then(()=>{
  /* Only re-render the page if something already asked for the library; otherwise just refresh the category lists in place */
  if(ncSeen){ncSeen=false;if(S.status==='nc')S.status='idle';route()}else refreshCats()})}};
 
@@ -89,7 +101,7 @@ if(LIGHTMQ.addEventListener)LIGHTMQ.addEventListener('change',e=>{if(!th)applyTh
 function toggleTheme(){const cur=document.documentElement.dataset.theme||'dark';th=cur==='dark'?'light':'dark';applyTheme(th);store.set('ls:theme',th)}
 
 /* ---------- nav ---------- */
-const LINKS=[['home','Home','#/','home'],['search','Search','#/search','search'],['categories','Categories','#/categories','grid'],['favorites','Favorites','#/favorites','heart']];
+const LINKS=[['home','Home','#/','home'],['examples','Examples','#/examples','grid'],['search','Search','#/search','search'],['categories','Categories','#/categories','grid'],['favorites','Favorites','#/favorites','heart']];
 function favCount(){return Object.keys(FAV).length}
 function drawNav(active){
  const badge=`<span class="cnt" data-fc ${favCount()?'':'hidden'}>${favCount()}</span>`;
@@ -112,14 +124,44 @@ ${full?`<div class="ptxt">${fmt(fill(p.text,S.brand))}</div>`:`<p class="pv">${e
 }
 
 /* ---------- views ---------- */
+let sampleP=null;
+const sampleData=()=>{if(!sampleP)sampleP=fetch(APP_BASE+'samples/samples.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Samples unavailable');return r.json()}).then(x=>Array.isArray(x.images)?x.images:[]);return sampleP};
+function sampleCard(s){
+ const rawId=s.promptId||s.prompt||'';
+ const id=esc(rawId);
+ const rawImg=s.image||((s.file||'').startsWith('samples/')?s.file:'samples/'+(s.file||''));
+ const img=esc(rawImg);
+ const title=esc(s.title||'Logo concept');
+ const cat=esc(s.category||'');
+ const alt=esc(s.alt||title);
+ if(!id||!img)return '';
+ return `<article class="sample-card"><a class="sample-media" href="#/prompt/${encodeURIComponent(rawId)}" aria-label="View prompt ${id}"><img src="${img}" alt="${alt}" loading="lazy" width="1200" height="900"></a><div class="sample-body"><div class="sample-top"><span class="sample-cat">${catName(cat)||cat}</span><span class="sample-badge">AI-generated</span></div><h3>${title}</h3><div class="sample-meta"><code>${id}</code></div><div class="sample-actions"><a class="ab" href="#/prompt/${encodeURIComponent(rawId)}">View Prompt</a><a class="ab sample-use" href="#/?use=${encodeURIComponent(s.promptId||s.prompt)}">Use Prompt</a></div></div></article>`;
+}
+async function loadSamples(){
+ const grid=$('#sample-grid'),state=$('#sample-state');if(!grid||!state)return;
+ try{
+  const all=await sampleData();
+  const valid=all.filter(s=>s&&(s.promptId||s.prompt)&&(s.image||s.file)&&s.alt&&s.category&&s.aiGenerated===true);
+  if(!valid.length){state.hidden=false;grid.innerHTML='';return}
+  const six=valid.slice(0,6);state.hidden=true;grid.innerHTML=six.map(sampleCard).join('');
+  const more=$('#sample-more');if(more)more.hidden=valid.length<=6;
+ }catch(e){state.hidden=false;grid.innerHTML='';state.textContent='Examples are unavailable right now.'}
+}
+async function loadUsePrompt(id){
+ if(!id)return;
+ try{const p=await API.get(id);if(p&&p.id){S.result=p;S.status='ok';drawResult(true);const r=$('#result');if(r)r.scrollIntoView({behavior:'smooth',block:'start'})}}
+ catch(e){S.status=e&&e.code==='NOT_CONNECTED'?'nc':'err';S.msg=e&&e.message||'Could not load this prompt.';drawResult(true)}
+}
 function home(prm){
  if(prm.get('c')!==null)S.cat=prm.get('c');
- app.innerHTML=`<section class="hero view" data-s="idle"><div><p class="eyebrow">Logo Studio</p><h1>Professional logo directions <em>for your brand.</em></h1><p class="lede">Enter a brand name, choose a style and generate a structured prompt for any image tool.</p>
+ app.innerHTML=`<section class="hero view" data-s="idle"><div class="hero-copy"><p class="eyebrow">Logo Studio</p><h1>Create a direction <em>for your brand.</em></h1><p class="lede">Enter a brand name, choose a style, and generate a structured logo prompt you can use with your preferred image tool.</p>
 <form class="gen" id="gf" novalidate><div><label for="bn">Brand name</label><input class="inp" id="bn" dir="auto" autocomplete="off" maxlength="60" placeholder="Enter your brand name…" value="${esc(S.brand)}" style="margin-top:10px"><p class="fe" id="bnerr" role="alert"></p></div>
 <div><label for="sc">Style</label><select class="inp" id="sc" style="margin-top:10px"><option value="">All styles</option>${CATLIST.map(c=>`<option value="${esc(c.id)}" ${c.id===S.cat?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
-<button class="btn pri" id="gb" type="submit">${ic('wand')}Generate prompt</button></form></div>
-<div class="out">${ART}<div class="tile"><div class="mono" id="mono"></div><div><div class="tn" id="tn" dir="auto"></div><div class="ts">Brand preview</div></div></div><div id="result" aria-live="polite"></div></div></section>`;
- tile();drawResult();
+<button class="btn pri" id="gb" type="submit">${ic('wand')}Generate Prompt</button></form></div>
+<div class="out"><div class="hero-mark" aria-hidden="true">${ART}</div><div class="tile"><div class="mono" id="mono"></div><div><div class="tn" id="tn" dir="auto"></div><div class="ts">Brand preview</div></div></div><div id="result" aria-live="polite"></div></div></section>
+<section class="sample-section" aria-labelledby="samples-title"><div class="section-head"><div><p class="eyebrow">Sample work</p><h2 id="samples-title">Explore Logo Examples</h2><p>See how Logo Studio prompts can translate into different visual directions.</p></div><a id="sample-more" class="ab" href="#/examples" hidden>View all examples</a></div><div class="sample-grid" id="sample-grid"></div><div class="sample-state" id="sample-state" hidden>Examples are coming soon.</div></section>`;
+ tile();drawResult();loadSamples();
+ const use=prm.get('use');if(use)loadUsePrompt(use);
 }
 function tile(){const b=S.brand.trim(),w=b.split(/\s+/).filter(Boolean);$('#mono')&&($('#mono').textContent=w.length?(Array.from(w[0])[0]+(w[1]?Array.from(w[1])[0]:'')).toUpperCase():'?');const n=$('#tn');if(n){n.textContent=b||'Your brand';n.classList.toggle('ph',!b)}}
 function drawResult(pop){
@@ -152,9 +194,13 @@ async function runSearch(reset){
   el.innerHTML=Q.items.length?Q.items.map(p=>card(p)).join('')+(Q.more?`<button class="btn sec" data-act="more">Load more</button>`:''):stateBox('search','No results',Q.q||Q.c?'Nothing matched your search. Prompts are written in English, so try different English keywords, a Prompt ID, or another category.':'There are no prompts to show yet.');
  }catch(e){if(tok===sTok)el.innerHTML=errBox(e,'retry-search')}
 }
+async function examples(){
+ app.innerHTML=`<section class="view examples-page"><a class="back" href="#/">${ic('arrow')}Back</a><p class="eyebrow">Sample work</p><h1 class="h2">Explore Logo Examples</h1><p class="lede">Curated demonstrations connected to the real Logo Studio prompt library.</p><div class="sample-grid" id="sample-grid"></div><div class="sample-state" id="sample-state">Loading examples…</div></section>`;
+ try{const all=await sampleData();const valid=all.filter(s=>s&&(s.promptId||s.prompt)&&(s.image||s.file)&&s.alt&&s.category&&s.aiGenerated===true);const g=$('#sample-grid'),st=$('#sample-state');g.innerHTML=valid.map(sampleCard).join('');st.hidden=!!valid.length;if(!valid.length)st.textContent='Examples are coming soon.'}catch(e){$('#sample-state').textContent='Examples are unavailable right now.'}
+}
 async function categories(){
  app.innerHTML=`<section class="view"><h1 class="h2">Categories</h1><p class="lede">Pick a logo style to browse its prompts or generate a new one.</p><div class="cats" id="cg">${skel(4)}</div></section>`;
- let list=CATLIST,failed=false;try{list=await API.categories()}catch{failed=true}
+ let list=CATLIST,failed=false; /* the built-in list mirrors the library, so this page never waits for it */
  if(location.hash.indexOf('categories')<0)return;
  const g=$('#cg');
  if(failed){g.innerHTML=stateBox('alert','Categories couldn’t be loaded','Reload the page and try again. If this keeps happening, update your browser.',retry('retry-cats'),'er');g.style.display='block';return}
@@ -179,14 +225,13 @@ function refreshCats(){
  const opts=(val,all)=>`<option value="">${all}</option>`+CATLIST.map(c=>`<option value="${esc(c.id)}" ${c.id===val?'selected':''}>${esc(c.name)}</option>`).join('');
  const sc=$('#sc');if(sc)sc.innerHTML=opts(S.cat,'All styles');
  const qc=$('#qc');if(qc)qc.innerHTML=opts(Q.c,'All categories');
- if(location.hash.indexOf('categories')>=0)categories();
 }
 
 /* ---------- router ---------- */
 function safeDecode(s){try{return decodeURIComponent(s)}catch(e){console.error('[Logo Studio] Invalid encoding in the page address.',e);return null}}
 function route(){
  const h=location.hash.slice(1)||'/',[path,qs]=h.split('?'),prm=new URLSearchParams(qs||''),seg=path.split('/').filter(Boolean),v=seg[0]||'home';
- drawNav(['home','search','categories','favorites'].includes(v)?v:'');window.scrollTo(0,0);
+ drawNav(['home','examples','search','categories','favorites'].includes(v)?v:'');window.scrollTo(0,0);
  const si=document.getElementById('seo-intro');if(si)si.hidden=v!=='home';
  if(v==='home')home(prm);else if(v==='search')search(prm);else if(v==='categories')categories();else if(v==='favorites')favorites();else if(v==='prompt'&&seg[1]){const pid=safeDecode(seg[1]);if(pid===null)app.innerHTML=`<div class="view">${stateBox('alert','Invalid link','This prompt link isn’t valid. Check the address and try again.','<a class="btn pri" href="#/">Go home</a>')}</div>`;else details(pid)}
  else app.innerHTML=`<div class="view">${stateBox('alert','Page not found','This page doesn’t exist.','<a class="btn pri" href="#/">Go home</a>')}</div>`;
@@ -233,3 +278,11 @@ document.addEventListener('input',e=>{
 document.addEventListener('change',e=>{if(e.target.id==='sc')S.cat=e.target.value;if(e.target.id==='qc'){Q.c=e.target.value;history.replaceState(null,'','#/search?q='+encodeURIComponent(Q.q)+(Q.c?'&c='+encodeURIComponent(Q.c):''));runSearch(true)}});
 route();
 if(!RM.matches&&matchMedia('(hover:hover)').matches){let tx=innerWidth*.7,ty=innerHeight*.2,cx=tx,cy=ty,raf=0;const tick=()=>{cx+=(tx-cx)*.08;cy+=(ty-cy)*.08;const s=document.body.style;s.setProperty('--mx',cx+'px');s.setProperty('--my',cy+'px');raf=Math.abs(tx-cx)+Math.abs(ty-cy)>.5?requestAnimationFrame(tick):0};addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY;if(!raf)raf=requestAnimationFrame(tick)},{passive:true})}
+
+/* ---------- start fetching the prompt library once the page is idle, or at the first sign of interaction ---------- */
+(function(){
+ const go=()=>{ensureLib().catch(()=>{})};
+ const idle=window.requestIdleCallback||(f=>setTimeout(f,1500));
+ addEventListener('load',()=>idle(go,{timeout:4000}));
+ ['pointerdown','keydown','focusin','touchstart'].forEach(ev=>addEventListener(ev,go,{once:true,passive:true}));
+})();
