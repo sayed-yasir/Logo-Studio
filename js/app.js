@@ -233,7 +233,7 @@ function route(){
  const h=location.hash.slice(1)||'/',[path,qs]=h.split('?'),prm=new URLSearchParams(qs||''),seg=path.split('/').filter(Boolean),v=seg[0]||'home';
  drawNav(['home','examples','search','categories','favorites'].includes(v)?v:'');window.scrollTo(0,0);
  const si=document.getElementById('seo-intro');if(si)si.hidden=v!=='home';
- if(v==='home')home(prm);else if(v==='search')search(prm);else if(v==='categories')categories();else if(v==='favorites')favorites();else if(v==='prompt'&&seg[1]){const pid=safeDecode(seg[1]);if(pid===null)app.innerHTML=`<div class="view">${stateBox('alert','Invalid link','This prompt link isn’t valid. Check the address and try again.','<a class="btn pri" href="#/">Go home</a>')}</div>`;else details(pid)}
+ if(v==='home')home(prm);else if(v==='examples')examples();else if(v==='search')search(prm);else if(v==='categories')categories();else if(v==='favorites')favorites();else if(v==='prompt'&&seg[1]){const pid=safeDecode(seg[1]);if(pid===null)app.innerHTML=`<div class="view">${stateBox('alert','Invalid link','This prompt link isn’t valid. Check the address and try again.','<a class="btn pri" href="#/">Go home</a>')}</div>`;else details(pid)}
  else app.innerHTML=`<div class="view">${stateBox('alert','Page not found','This page doesn’t exist.','<a class="btn pri" href="#/">Go home</a>')}</div>`;
 }
 const RM=matchMedia('(prefers-reduced-motion:reduce)');let ct;
