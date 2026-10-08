@@ -98,6 +98,81 @@
       "aiGenerated": true,
       "prompt": "MINIMAL-0079",
       "promptId": "MINIMAL-0079"
+    },
+    {
+      "category": "architecture",
+      "image": "samples/images/studio/NOVARIS-STUDIO.webp",
+      "file": "images/studio/NOVARIS-STUDIO.webp",
+      "title": "Novaris — Architectural Monogram Direction",
+      "alt": "Studio-generated architectural logo presentation for Novaris",
+      "tool": "Logo Studio image generation",
+      "aiGenerated": true,
+      "source": "studio",
+      "prompt": "STUDIO-NOVARIS-001",
+      "promptId": "STUDIO-NOVARIS-001",
+      "industry": "Architecture",
+      "style": [
+        "Luxury",
+        "Modern",
+        "Geometric"
+      ],
+      "promptText": "Create a distinctive logo for \"NOVARIS\"; Architecture brand; Architecture — Letterform Fusion; concept: an abstracted initial structure derived from plan abstraction, expressed through proportion, refined typography, restraint, reduction; symbol logic: construct the mark from the brand initials, using one intentional overlap or shared stroke rather than literal letter stacking; style direction: proportion, refined typography, restraint, reduction; color: stone, charcoal, off-white, muted accent; black/cream/metallic or restrained brand palette; restrained palette with one intentional accent; material-aware high-contrast palette, print-aware palette and strong hierarc...; application direction: Building, Packaging, Business Card; application priorities: architectural scale, wayfinding, distance recognition, shelf recognition, hierarchy, print reproduction; application shape: monumental geometric silhouette, distinctive silhouette that survives packaging scale; application composition: facade, entrance and wayfinding variants, primary lockup with flexible vertica..."
+    },
+    {
+      "category": "gaming",
+      "image": "samples/images/studio/VELORA-STUDIO.webp",
+      "file": "images/studio/VELORA-STUDIO.webp",
+      "title": "Velora — Gaming Chrome Direction",
+      "alt": "Studio-generated gaming logo presentation for Velora",
+      "tool": "Logo Studio image generation",
+      "aiGenerated": true,
+      "source": "studio",
+      "prompt": "STUDIO-VELORA-001",
+      "promptId": "STUDIO-VELORA-001",
+      "industry": "Gaming",
+      "style": [
+        "3D",
+        "Chrome",
+        "Futuristic"
+      ],
+      "promptText": "Create a distinctive logo for \"VELORA\"; Gaming / Esports brand; Gaming / Esports — Symbol Fusion; concept: two related visual ideas fused into one inseparable silhouette, expressed through form volume, material definition, studio lighting, metal surface; symbol logic: merge a brand-specific cue with motion so the result reads as one original symbol; build a bold game-ready silhouette with a memorable profile and controlled aggression; avoid generic esports symbols; style direction: form volume, material definition, studio lighting, metal surface; color: high contrast, dark base, focused accent; material-driven palette; silver/chrome with controlled reflections; deep n...; render logic: form volume, material definition, studio lighting, metal surface, controlled highlights, product-render direction; material: Chrome; high-fidelity render; professional studio render, physically coherent material response, controlled highlights and shadows; render avoid: photorealistic scene clutter, excessive lens flare, busy environment; application direction: App Icon, Clothing..."
+    },
+    {
+      "category": "fashion",
+      "image": "samples/images/studio/SELVANA-STUDIO.webp",
+      "file": "images/studio/SELVANA-STUDIO.webp",
+      "title": "Selvana — Luxury Fashion Direction",
+      "alt": "Studio-generated luxury fashion logo presentation for Selvana",
+      "tool": "Logo Studio image generation",
+      "aiGenerated": true,
+      "source": "studio",
+      "prompt": "STUDIO-SELVANA-001",
+      "promptId": "STUDIO-SELVANA-001",
+      "industry": "Fashion",
+      "style": [
+        "Luxury",
+        "Editorial",
+        "Minimal"
+      ],
+      "promptText": "Create a distinctive logo for \"SELVANA\"; Fashion / Clothing brand; Fashion / Clothing — Custom Wordmark; concept: a distinctive typographic identity where the brand name itself becomes the symbol, expressed through proportion, refined typography, restraint, typographic rhythm; symbol logic: create recognition through one or two custom letterform interventions rather than decorative effects; use refined proportion, custom lettering, and restrained symbolism to create a distinctive fashion identity; style direction: proportion, refined typography, restraint, typographic rhythm; color: black, cream, muted metallic, monochrome; black/cream/metallic or restrained brand pa...; application direction: Packaging, Clothing; application priorities: shelf recognition, hierarchy, print reproduction, printability, embroidered silhouette, distance recognition; application shape: distinctive silhouette that survives packaging scale, bold production-friendly silhouette; application composition: primary lockup with flexible vertical and horizontal variants, front-print and small..."
+    },
+    {
+      "category": "showcase",
+      "image": "samples/images/studio/SHOWCASE-GRID-STUDIO.webp",
+      "file": "images/studio/SHOWCASE-GRID-STUDIO.webp",
+      "title": "Logo Studio — Multi-Industry Showcase",
+      "alt": "Studio-generated showcase of multiple logo directions",
+      "tool": "Logo Studio image generation",
+      "aiGenerated": true,
+      "source": "studio",
+      "prompt": "STUDIO-SHOWCASE-001",
+      "promptId": "STUDIO-SHOWCASE-001",
+      "industry": "Multi-industry",
+      "style": [
+        "Modern",
+        "Premium",
+        "Brand Presentation"
+      ]
     }
   ]
 }

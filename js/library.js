@@ -46,13 +46,28 @@ try{
 }
 const C=M.c,H=M.h;
 const tc=C.find(c=>c.id==='tech-ai');if(tc)tc.name='Tech AI';
+/* Keep typography and composition from contradicting each other (the two fields are picked independently). */
+const LIGHTER=' Use a lighter weight than the mark so the symbol leads and the name supports.',MATCH=' Match the stroke weight of the lettering to the weight of the mark.';
+const fixType=(typ,comp)=>{
+ const sameWeight=/share one baseline and one weight|identical visual weight|wordmark's weight matches|share one corner radius and one stroke weight/i.test(comp);
+ const nameSmall=/hairline-light|sits small|set small|detached secondary|small, wide-tracked|small secondary/i.test(comp);
+ const noName=/^The lettering stands alone|^The letters rely on their own silhouette/i.test(comp);
+ if(sameWeight||noName)typ=typ.replace(LIGHTER,'');
+ if(nameSmall)typ=typ.replace(MATCH,'');
+ return typ};
 const fixCase=s=>/lowercase/i.test(s)&&/capital|uppercase|small caps/i.test(s)?s.replace(/\s*Use all (lowercase|capitals)[^.]*\./,''):s;
 C.forEach(c=>{c.vi=c.f.map((l,k)=>c.v.indexOf(k));c.fl=c.f.map(l=>l.map(s=>s.toLowerCase()));c.nl=(c.name+' '+c.p).toLowerCase();c.w=c.v.length});
 const pad=n=>String(n).padStart(4,'0');
+/* Compact prompt: the stored fields are unchanged (IDs stay stable), but the fixed boilerplate fields are merged into one short OUTPUT line. */
+const OUT='Flat vector logo on a plain background, strong at favicon size and in one color. No mockups, 3D scenes, gradients, stock icons or copied logos.';
+const shortIntro=s=>s.replace(/^Create a finished, original (.*?) logo for the exact brand name written above\./,'Design an original $1 logo for the exact brand name above.')
+ .replace(/\s*Infer a credible visual direction from the name's letters, sound and meaning, and never invent facts about the brand or what it does\./,' Never invent facts about the brand.');
+const tidy=s=>s.replace(/,?\s*with a tone of [^.]*\./i,'.').replace(/,?\s*built only from the construction described above[^.]*\./i,'.').replace(' Stroke and corner treatment: ',' Strokes: ');
 function build(ci,n){
- const c=C[ci],row=c.o+(n-1)*c.w,val=k=>{const v=c.vi[k],s=c.f[k][v<0?0:BIN[row+v]];return k===7?fixCase(s):s};
- let t='BRAND NAME: {brand}\n\n'+val(0);
- for(let k=1;k<c.f.length;k++)t+='\n\n'+H[k-1]+':\n'+val(k);
+ const c=C[ci],row=c.o+(n-1)*c.w,val=k=>{const v=c.vi[k],s=c.f[k][v<0?0:BIN[row+v]];return k===7?fixType(fixCase(s),val(6)):s};
+ const sec=[['CONCEPT',val(1)+' '+val(4)],['FORM',tidy(val(2))+' '+tidy(val(3))],['STYLE',tidy(val(5))+' '+val(8)],['LAYOUT',val(6)],['TYPE',val(7)],['OUTPUT',OUT]];
+ let t='BRAND NAME: {brand}\n\n'+shortIntro(val(0));
+ sec.forEach(x=>{t+='\n\n'+x[0]+':\n'+x[1].replace(/\s+/g,' ').trim()});
  return{id:c.p+'-'+pad(n),text:t,category:c.id};
 }
 function parseId(s){
@@ -71,6 +86,7 @@ function matcher(c,terms){
   return true};
 }
 LogoStudio.connect({
+ stats:async()=>({categories:C.length,perCategory:N,total:C.length*N}),
  categories:async()=>C.map(c=>({id:c.id,name:c.name,desc:c.desc})),
  get:async id=>{const r=parseId(String(id));return r?build(r[0],r[1]):null},
  generate:async({category,exclude=[]})=>{

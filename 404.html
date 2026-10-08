@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark light">
+<title>Page not found | Logo Studio</title>
+<style>
+:root{color-scheme:dark light;--bg:#07060B;--text:#F1EEFA;--muted:#A29DB3;--accent:#A78BFA;--on:#0B0716}
+@media(prefers-color-scheme:light){:root{--bg:#F7F5FC;--text:#16121F;--muted:#5D5870;--accent:#6D28D9;--on:#fff}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px;background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:center}
+h1{margin:0 0 8px;font-weight:300;font-size:clamp(2rem,8vw,3rem);letter-spacing:-.03em}p{margin:0 0 28px;color:var(--muted)}
+a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 26px;border-radius:999px;background:var(--accent);color:var(--on);text-decoration:none;font-weight:500}
+a:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+<h1>Page not found</h1>
+<p>This address does not exist on Logo Studio.</p>
+<a id="home" href="/">Go to Logo Studio</a>
+</main>
+<script>
+/* On a GitHub Pages project site the app lives one folder below the domain root (…/Logo-Studio/). */
+(function(){var p=location.pathname.split('/').filter(Boolean);if(location.hostname.slice(-10)==='github.io'&&p.length)document.getElementById('home').href='/'+p[0]+'/'})();
+</script>
+</body>
+</html>
