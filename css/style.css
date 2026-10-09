@@ -106,7 +106,7 @@ dl{margin:18px 0 0;display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font
 .foot{border-top:1px solid var(--line);padding:36px 0 calc(32px + env(safe-area-inset-bottom,0px))}
 .fgrid{display:grid;gap:32px 40px;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr))}
 .foot p{margin:12px 0 0;max-width:42ch;color:var(--muted);font-size:.85rem}
-.foot nav{display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:.88rem;color:var(--muted)}.foot nav a{padding:5px 0}.foot nav a:hover{color:var(--text)}.foot nav h2{margin:0 0 8px;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:var(--muted)}
+.foot nav{display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:.88rem;color:var(--muted)}.foot nav a{padding:5px 0;min-height:44px;display:inline-flex;align-items:center}.foot nav a:hover{color:var(--text)}.foot nav h2{margin:0 0 8px;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:var(--muted)}
 .foot .legal{max-width:none;margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:.78rem}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:60;transform:translate(-50%,16px);opacity:0;pointer-events:none;padding:11px 18px;border-radius:999px;background:var(--text);color:var(--bg);font-size:.85rem;transition:opacity .4s,transform .5s var(--ease)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
@@ -262,3 +262,6 @@ main{padding-bottom:36px}
 @media(max-width:719px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:nth-child(3){border-inline-start:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}.stat{padding:18px}}
 @media(max-width:599px){.steps,.feat-grid{grid-template-columns:1fr}.steps li:last-child{grid-column:auto}}
 @media(max-width:899px){.fgrid nav:last-child{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px}.fgrid nav:last-child h2{grid-column:1/-1}}
+
+/* Stage 23 — comfortable touch targets on phones */
+@media(max-width:899px){.ab,.tg,.ca .ab,.sample-actions .ab{min-height:44px}.tg{min-width:44px}.top .logo{min-height:44px;display:inline-flex;align-items:center}}

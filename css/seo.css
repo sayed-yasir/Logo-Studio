@@ -12,7 +12,7 @@
 .seo-sec p a{color:var(--text);text-decoration:underline;text-underline-offset:3px}
 ul.seo-links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px 24px}
 ul.seo-links li{margin:0}
-ul.seo-links a{display:block;padding:7px 0;color:var(--muted);transition:color .3s}
+ul.seo-links a{display:flex;align-items:center;min-height:44px;padding:7px 0;color:var(--muted);transition:color .3s}
 ul.seo-links a:hover{color:var(--text)}
 .seo-intro{margin-top:clamp(56px,9vw,104px);padding-top:clamp(32px,5vw,56px);border-top:1px solid var(--line)}
 .seo-intro[hidden]{display:none}

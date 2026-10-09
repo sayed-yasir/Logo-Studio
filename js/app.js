@@ -243,7 +243,7 @@ async function generate(){
 let sTok=0,Q={q:'',c:'',page:1,items:[]};
 function search(prm){
  Q.q=prm.get('q')||'';Q.c=prm.get('c')||'';
- app.innerHTML=`<section class="view"><h1 class="h2">Search prompts</h1><form class="sform" id="sf" role="search"><div class="sbox">${ic('search')}<input id="q" type="search" dir="auto" autocomplete="off" aria-label="Search prompts" placeholder="Search prompts, categories or Prompt ID…" value="${esc(Q.q)}"></div><select class="inp" id="qc" aria-label="Category"><option value="">All categories</option>${CATLIST.map(c=>`<option value="${esc(c.id)}" ${c.id===Q.c?'selected':''}>${esc(c.name)}</option>`).join('')}</select></form><div class="list" id="sres" aria-live="polite"></div></section>`;
+ app.innerHTML=`<section class="view"><h1 class="h2">Search prompts</h1><form class="sform" id="qf" role="search"><div class="sbox">${ic('search')}<input id="q" type="search" dir="auto" autocomplete="off" aria-label="Search prompts" placeholder="Search prompts, categories or Prompt ID…" value="${esc(Q.q)}"></div><select class="inp" id="qc" aria-label="Category"><option value="">All categories</option>${CATLIST.map(c=>`<option value="${esc(c.id)}" ${c.id===Q.c?'selected':''}>${esc(c.name)}</option>`).join('')}</select></form><div class="list" id="sres" aria-live="polite"></div></section>`;
  runSearch(true);
 }
 async function runSearch(reset){
